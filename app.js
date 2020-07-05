@@ -1,5 +1,6 @@
 const express = require("express");
 const bodyParser = require("body-parser");
+const mongoose = require("mongoose");
 const dotenv = require("dotenv");
 
 const placesRoutes = require("./routes/places-routes");
@@ -33,5 +34,17 @@ app.use((error, req, res, next) => {
   res.json({ message: error.message || "An unknown error occurred!" });
 });
 
-// Setup server on port 5000
-app.listen(5000);
+// Setup db connection and server on port 5000
+mongoose
+  .connect(process.env.MONGODB_URI, {
+    useNewUrlParser: true,
+    useUnifiedTopology: true,
+    useCreateIndex: true,
+    useFindAndModify: false,
+  })
+  .then(() => {
+    app.listen(5000);
+  })
+  .catch((error) => {
+    console.log(error);
+  });

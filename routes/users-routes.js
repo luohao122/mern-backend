@@ -1,21 +1,25 @@
 const express = require("express");
+const { check } = require("express-validator");
+
+const usersController = require("../controllers/users-controllers");
 
 const router = express.Router();
 
-const USERS = [
-  {
-    id: `u1`,
-    name: "Jake Luong",
-    image: "https://m.media-amazon.com/images/I/51QRRRLNgSL._AC_SL260_.jpg",
-    places: 3,
-  },
-];
+// GET /api/users
+router.get("/", usersController.getUsers);
 
-// GET /api/users/:userId
-router.get("/:userId", (req, res, next) => {
-  const userId = req.params.userId;
-  const user = USERS.find((u) => u.id === userId);
-  res.status(200).json({ user });
-});
+// POST /api/users/signup
+router.post(
+  "/signup",
+  [
+    check("name").not().isEmpty(),
+    check("email").normalizeEmail().isEmail(),
+    check("password").isLength({ min: 6 }),
+  ],
+  usersController.signup
+);
+
+// POST /api/users/login
+router.post("/login", usersController.login);
 
 module.exports = router;
