@@ -16,6 +16,20 @@ const app = express();
 // Setup bodyParser to parse incoming request to JSON format
 app.use(bodyParser.json());
 
+//
+app.use((req, res, next) => {
+  res.setHeader("Access-Control-Allow-Origin", "*"); // Open api to all domain
+  res.setHeader(
+    "Access-Control-Allow-Headers",
+    "Origin, X-Requested-With, Content-Type, Accept, Authorization"
+  );
+  res.setHeader(
+    "Access-Control-Allow-Methods",
+    "GET, POST, PUT, PATCH, DELETE"
+  );
+  next();
+});
+
 // Setup routes for app
 app.use("/api/places", placesRoutes);
 app.use("/api/users", usersRoutes);

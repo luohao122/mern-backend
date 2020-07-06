@@ -22,6 +22,7 @@ exports.getUsers = async (req, res, next) => {
 exports.signup = async (req, res, next) => {
   const error = validationResult(req);
   if (!error.isEmpty()) {
+    console.log(error);
     return next(
       new HttpError("Invalid inputs passed, please check your data.", 422)
     );
@@ -89,5 +90,8 @@ exports.login = async (req, res, next) => {
     return next(error);
   }
 
-  res.json({ message: "Logged In!" });
+  res.json({
+    message: "Logged In!",
+    user: existingUser.toObject({ getters: true }),
+  });
 };

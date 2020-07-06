@@ -101,12 +101,19 @@ exports.createPlace = async (req, res, next) => {
   }
 
   try {
-    const sess = await mongoose.startSession();
-    sess.startTransaction();
-    await createdPlace.save({ session: sess });
+    // Using mongoose transaction, need to create collection manually
+    // Uncommnent this if below solution is not working
+
+    // const sess = await mongoose.startSession();
+    // sess.startTransaction();
+    // await createdPlace.save({ session: sess });
+    // user.places.push(createdPlace);
+    // await user.save({ session: sess });
+    // await sess.commitTransaction();
+
+    await createdPlace.save();
     user.places.push(createdPlace);
-    await user.save({ session: sess });
-    await sess.commitTransaction();
+    await user.save();
   } catch (err) {
     const error = new HttpError(
       "Creating place failed, please try again.",
