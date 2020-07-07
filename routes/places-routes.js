@@ -4,6 +4,8 @@ const { check } = require("express-validator");
 const router = express.Router();
 
 const placesController = require("../controllers/places-controllers");
+const fileUpload = require("../middleware/file-upload");
+const auth = require("../middleware/auth");
 
 // GET /api/places/:placeId
 router.get("/:placeId", placesController.getPlaceById);
@@ -11,9 +13,12 @@ router.get("/:placeId", placesController.getPlaceById);
 // GET /api/places/user/:userId
 router.get("/user/:userId", placesController.getPlacesByUserId);
 
+router.use(auth);
+
 // POST /api/places
 router.post(
   "/",
+  fileUpload.single("image"),
   [
     check("title").not().isEmpty(),
     check("description").isLength({ min: 5 }),

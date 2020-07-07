@@ -1,3 +1,6 @@
+const fs = require("fs");
+const path = require("path");
+
 const express = require("express");
 const bodyParser = require("body-parser");
 const mongoose = require("mongoose");
@@ -16,7 +19,10 @@ const app = express();
 // Setup bodyParser to parse incoming request to JSON format
 app.use(bodyParser.json());
 
-//
+// Setup images serving statically
+app.use("/uploads/images", express.static(path.join("uploads", "images")));
+
+// Setup headers to handle cors requests
 app.use((req, res, next) => {
   res.setHeader("Access-Control-Allow-Origin", "*"); // Open api to all domain
   res.setHeader(
@@ -41,21 +47,32 @@ app.use((req, res, next) => {
 
 // Setup defauld error handling middleare using Express
 app.use((error, req, res, next) => {
+  // Delete file if there are any errors
+  if (req.file) {
+    fs.unlink(req.file.path, (err) => {
+      console.log(err);
+    });
+  }
+
   if (res.headerSent) {
     return next(error);
   }
+
   res.status(error.code || 500);
   res.json({ message: error.message || "An unknown error occurred!" });
 });
 
 // Setup db connection and server on port 5000
 mongoose
-  .connect(process.env.MONGODB_URI, {
-    useNewUrlParser: true,
-    useUnifiedTopology: true,
-    useCreateIndex: true,
-    useFindAndModify: false,
-  })
+  .connect(
+    `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASSWORD}@cluster0.bkmox.mongodb.net/${process.env.DB_NAME}?retryWrites=true&w=majority`,
+    {
+      useNewUrlParser: true,
+      useUnifiedTopology: true,
+      useCreateIndex: true,
+      useFindAndModify: false,
+    }
+  )
   .then(() => {
     app.listen(5000);
   })
